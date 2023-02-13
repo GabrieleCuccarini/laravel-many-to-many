@@ -20,6 +20,7 @@
           <th>Immagine di copertina</th>
           <th>Link Github</th>
           <th>Tipologia</th>
+          <th>Tecnologia</th>
           <th>Azioni</th>
         </tr>
       </thead>
@@ -32,6 +33,11 @@
             <td><img src="{{ asset('storage/' . $project->cover_img) }}" alt=""></td>
             <td>{{ $project->link }}</td>
             <td>{{ $project->type_id }}</td>
+            <td>
+              @foreach ($project->technologies as $technology)
+              {{ $technology->tech_name }}
+              @endforeach
+            </td>
             <td>
               <a href="{{ route('admin.projects.show', $project->id) }}" class="btn btn-link">
                 <i class="fas fa-eye"></i>
