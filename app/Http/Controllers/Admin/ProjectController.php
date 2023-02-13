@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use App\Models\Technology;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -31,7 +32,9 @@ class ProjectController extends Controller {
      */
     public function create()
     {
-        return view("admin.projects.create");
+        $technologies = Technology::all();
+
+        return view("admin.projects.create", compact('technologies'));
     }
 
     /**
@@ -42,14 +45,10 @@ class ProjectController extends Controller {
      */
     public function store(StoreProjectRequest $request)
     {
-        //FUNZIONAMENTO BASE SENZA IMMAGINI
-        // $data = $request->validated();
-        // $project = Project::create($data);
-        // dd($project);
-        // return redirect()->route('admin.projects.show',compact('project'));
-
         //FUNZIONAMENTO CON IMMAGINI IN UPLOAD
         $data = $request->validated();
+        $technologies = Technology::all();
+
         if (key_exists("cover_img", $data)){
 
             $path = Storage::put("projects", $data["cover_img"]);
@@ -63,7 +62,11 @@ class ProjectController extends Controller {
         "user_id" => Auth::id() 
         ]);
 
-        return redirect()->route('admin.projects.show',compact('project'));
+        if ($request->has("technologies")) {
+            $project->technologies()->attach($data["technologies"]);
+        }
+
+        return redirect()->route('admin.projects.show',compact('project','technologies'));
     }
 
     /**
@@ -74,7 +77,9 @@ class ProjectController extends Controller {
      */
     public function show(Project $project)
     {
-        return view('admin.projects.show',compact('project'));
+        $technologies = Technology::all();
+        // dd($technologies);
+        return view('admin.projects.show',compact('project', 'technologies'));
     }
 
     /**
@@ -86,10 +91,12 @@ class ProjectController extends Controller {
     public function edit($id)
     {
         $project = project::findOrFail($id);
-        // recupero un array con TUTTI i types del db
+        $technologies = Technology::all();
+
+        // Get array dei types del db
         // $types = Type::all();
 
-        return view('admin.projects.edit',compact('project'));
+        return view('admin.projects.edit',compact('project','technologies'));
     }
 
     /**
@@ -104,17 +111,23 @@ class ProjectController extends Controller {
     {
         $data = $request->validated();
         //FUNZIONAMENTO CON IMMAGINI IN UPLOAD
-        $project =  Project::findOrFail($id);  
+        $project =  Project::findOrFail($id); 
+        $technologies = Technology::all();
+
         if (key_exists("cover_img", $data)){   
             $path = Storage::put("projects", $data["cover_img"]);
             Storage::delete($project->cover_img);
         }
+
         $project->update([
             ...$data,
             "user_id" =>Auth::id(),
-            "cover_img"=>$path ?? $project->cover_img,
+            "cover_img"=>$path ?? $project->cover_img
         ]);
-        return redirect()->route('admin.projects.show', $id);
+
+        $project->technologies()->sync($data["technologies"]);
+
+        return redirect()->route('admin.projects.show', compact('project','technologies'));
     }
 
     /**
@@ -126,7 +139,9 @@ class ProjectController extends Controller {
     public function destroy($id)
     {
         $project = Project::findOrFail($id);
+        $project->technologies()->detach();
         $project->delete();
+
         return redirect()->route('admin.projects.index');
     }
 }

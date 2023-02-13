@@ -10,6 +10,7 @@
         <th> Immagine di copertina </th>
         <th> Link Github </th>
         <th> Tipologia </th>
+        <th> Tecnologia </th>
 
       </tr>
     </thead>
@@ -22,6 +23,11 @@
             <td><img src="{{ asset('storage/' . $project->cover_img) }}" alt=""></td>
             <td>{{ $project->link }}</td>
             <td>{{ $project->type_id }}</td>
+            <td>
+              @foreach ($project->technologies as $technology)
+              {{ $technology->tech_name }}
+              @endforeach
+            </td>
         </tr>
     </tbody>
 </table>

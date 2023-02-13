@@ -34,7 +34,8 @@ class UpdateProjectRequest extends FormRequest
             "description" => "required|string",
             "cover_img" => "image",
             "link" => "required|string",
-            "type_id" => "nullable|exists:types,id"
+            "type_id" => "nullable|exists:types,id",
+            "technologies" => "nullable|array|exists:technologies,id"
         ];
     }
     
@@ -45,8 +46,7 @@ class UpdateProjectRequest extends FormRequest
             "name.max" =>  "Il titolo deve avere massimo :max caratteri",
             "description.required" => "Il progetto deve avere un contenuto",
             "link.required" => "Il progetto deve avere un link github",
-            "link.string" => "Il campo 'Link' deve essere una stringa",
-            "type_id.exists" => "Deve esistere un ID all'interno di types" 
+            "link.string" => "Il campo 'Link' deve essere una stringa"
         ];
     }
 }

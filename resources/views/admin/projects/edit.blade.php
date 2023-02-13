@@ -66,6 +66,27 @@
             @enderror
         </div>
 
+        <div class="mb-3">
+            <div class="mb-1"><b>Tecnologie</b></div>
+            @foreach ($technologies as $technology)
+            <div class="form-check form-check-inline @error('technologies') is-invalid @enderror">
+            {{-- Il name dell'input ha come suffisso le quadre [] che indicheranno al server,
+                    di creare un array con i vari tag che stiamo inviando --}}
+            <input class="form-check-input @error('technologies') is-invalid @enderror" type="checkbox"
+                id="CheckTechnology_{{ $loop->index }}" value="{{ $technology->id }}" name="technologies[]"
+                {{ in_array( $technology->id, old('technologies', [])) ? 'checked' : '' }}
+                >
+            <label class="form-check-label" for="CheckTechnology_{{ $loop->index }}">{{ $technology->tech_name }}</label>
+            </div>
+            @endforeach
+
+            @error('technologies')
+            <div class="invalid-feedback">
+            {{ $message }}
+            </div>
+            @enderror
+        </div>
+
     <button class="btn btn-primary" type="submit">Salva le modifiche</button>
     </form>
 </div>
